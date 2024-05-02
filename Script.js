@@ -29,11 +29,12 @@ for (var i = 0; i < 9; i++) {
             outputy.innerHTML = "y: " + y;
             outputx.innerHTML = "x: " + x;
             
-            var row = getRow(x);
-            var col = getCol(y);
+            var row = getRow(y);
+            var col = getCol(x);
+
             
 
-            if(!checkValid(event.target.value, x, y, row, col, grid)){
+            if(!checkValid(event.target, row, col, grid)){
                 event.target.value = '';
             }
         });
@@ -82,53 +83,33 @@ function getGrid(x, y) {
     return grid;
 }
 
-function checkValid(val, x, y, row, col, grid) { 
+function checkValid(target, row, col, grid) { 
 
-    var valid = true;
-
-    //if some tiles are already colored, reset them
-    if (coloredTiles.length > 0) {
-        for (var i = 0; i < coloredTiles.length; i++) {
-            coloredTiles[i].style.backgroundColor = 'rgb(152, 152, 152)';
-        }
-        coloredTiles = [];
+    if (target.value == '') {
+        return true;
     }
 
-    //if the input is empty, return
-    if (val == '') {
-        return;
-    }
 
-    //check if the input is valid
+    let value = target.value;
+
     for (var i = 0; i < 9; i++) {
+        if (row[i].value == value && row[i] != target) {
 
-        if(i == y || i == x) {
-            //tile being checked is the same as the input
-            continue;
+            return false;        
         }
 
-        //check row 
-        if (row[i].value == val) {
-            row[i].style.backgroundColor = 'red';
-            coloredTiles.push(row[i]);
-            valid = false;
+        if (col[i].value == value && col[i] != target) {
+            return false; 
         }
 
-        //check collumn
-        if (col[i].value == val) {
-            col[i].style.backgroundColor = 'red';
-            coloredTiles.push(col[i]);
-            valid = false;
-        }
-
-        if (grid[i].value == val) {
-            grid[i].style.backgroundColor = 'red';
-            coloredTiles.push(grid[i]);
-            valid = false;
+        if (grid[i].value == value && grid[i] != target) {
+            return false; 
         }
     }
-    return valid;
     
+    return true;
+
+
 }
 
 function getY(target) {
