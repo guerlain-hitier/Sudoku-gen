@@ -1,6 +1,13 @@
+.board {
+    display: grid;
+    justify-content: center;
+    flex-wrap: wrap; /* This allows the items to wrap onto the next line if there isn't enough space */
+}
+
+
 .third{
-    height: 150px;
-    width: 450px;
+    height: 20vh;
+    width: 60vh;
     display: grid;
     grid-template-columns: repeat(0);
     border-bottom: 1px solid rgb(0, 0, 0);
@@ -31,7 +38,7 @@
     height: 100%;
     border: 1px solid black;
     background-color: rgb(152, 152, 152);
-    font-size: 1rem;
+    font-size: 2rem;
     text-align: center;
     font-weight: initial;
     color: black;
