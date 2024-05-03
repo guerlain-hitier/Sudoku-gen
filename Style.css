@@ -1,9 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
 .board {
     display: grid;
     justify-content: center;
-    flex-wrap: wrap; /* This allows the items to wrap onto the next line if there isn't enough space */
+
 }
 
+.buttons{
+
+    display: flex;
+    justify-content: center;
+}
+
+button {
+    height: 7vh;
+    font-size: 2rem;
+    border: 2;
+    background-color: rgba(255, 255, 255, 0);
+    border-color:rgb(192, 192, 192);
+    border-style:dashed;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family:'Roboto', sans-serif;
+    font-weight: 500;
+    margin-left: 2vw;
+    margin-top: 1vh;
+    
+}
+
+#generate{
+    padding-right: 19px;
+    padding-left: 19px;
+}   
+
+button:hover {
+    border-style: solid;
+    transition: all 1s ease-in; /* Add this line */
+
+}
 
 .third{
     height: 20vh;
@@ -24,10 +58,14 @@
 
 #third1{
     border-top: 3px solid rgb(0, 0, 0);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 #third3{
     border-bottom: 3px solid rgb(0, 0, 0);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 
