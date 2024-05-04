@@ -9,6 +9,10 @@ var coloredTiles = [];
 var outputy = document.getElementById('outputy');
 var outputx = document.getElementById('outputx');
 var output = document.getElementById('output');
+var slider = document.getElementById("myRange");
+slider.oninput = function() {
+    minRemoved = 81 - this.value;
+  }
 var allowedInputs = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 var x;
 var y;
@@ -16,6 +20,8 @@ var grid;
 var row;
 var col;
 var solvedBoard;
+var minRemoved = 40;
+var removed;
 
 for (var i = 0; i < 9; i++) {
     //get current inner div
@@ -32,6 +38,12 @@ for (var i = 0; i < 9; i++) {
             
             setValues(event);
             checkInput(event, row, col, grid);
+            if (isSolved()) {
+                colorTiles();
+            } else {
+                resetTiles();
+            }
+
          
 
         });
@@ -39,35 +51,33 @@ for (var i = 0; i < 9; i++) {
     }
 }
 
-function solvable(board) {
-    // Create a copy of the board so we don't modify the original
-    solutions = []
-    let copyBoard = []
-    for (var i = 0; i < 9; i++) {
-        copyBoard.push([]);
-        for (var j = 0; j < 9; j++) {
-            copyBoard[i].push({value: board[i][j].value});
-        }
-    }
-
-    for (var i = 0; i < 9; i++) {
-        for (var j = 0; j < 9; j++) {
-            if (copyBoard[i][j] == '') {
-                for (var num = 1; num <= 9; num++) {
-                    if (possible(i, j, num)) {
-                        copyBoard[i][j] = num;
-                        if (solvable(copyBoard)) {
-                            return true;
-                        }
-                        copyBoard[i][j] = '';
-                    }
-                }
-                return false; // return false when no number can be placed in the current cell
-            }
-        }
-    }
-    return true; // return true when all cells are filled
+function solveBoard() {
+    generateSolvedBoard();
 }
+
+function colorTiles() {
+    for (var i = 0; i < 9; i++) {
+        for (var j = 0; j < 9; j++) {
+            board[i][j].style.backgroundColor = 'rgb(103, 249, 105)';
+        }
+    }
+}
+
+function resetTiles() {
+    for (var i = 0; i < 9; i++) {
+        for (var j = 0; j < 9; j++) {
+            board[i][j].style.backgroundColor = 'rgb(152, 152, 152)';
+        }
+    }
+}
+
+function isSolved() {
+    if (getEmptyCells().length > 0) {
+        return false;
+    }
+    return true;
+}
+
 function generateSolvedBoard() {
     for (var i = 0; i < 9; i++) {
         for (var j = 0; j < 9; j++) {
@@ -113,18 +123,18 @@ function shuffle(array) {
 
 function generateBoard() {
     generateSolvedBoard();
+    removed = 0;
     removeValues(getFilledCells());
 }
 
-async function removeValues() {
-    await new Promise(r => setTimeout(r, 100));
-    currentCell = getRandomFilledCell(getFilledCells());
-    oldVal = currentCell.value;
-    currentCell.value = '';
-    if (!solvable(board)) {
-        currentCell.value = oldVal;
+function removeValues() {
+    if (removed >= minRemoved) {
         return;
     }
+    removed++;
+    // await new Promise(r => setTimeout(r, 0));
+    let currentCell = getRandomFilledCell(getFilledCells());
+    currentCell.value = '';
     removeValues();
 }
 
