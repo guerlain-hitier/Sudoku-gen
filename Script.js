@@ -41,18 +41,25 @@ for (var i = 0; i < 9; i++) {
 
 function solvable(board) {
     // Create a copy of the board so we don't modify the original
-    var copyBoard = board;
+    solutions = []
+    let copyBoard = []
+    for (var i = 0; i < 9; i++) {
+        copyBoard.push([]);
+        for (var j = 0; j < 9; j++) {
+            copyBoard[i].push({value: board[i][j].value});
+        }
+    }
 
     for (var i = 0; i < 9; i++) {
         for (var j = 0; j < 9; j++) {
-            if (copyBoard[i][j].value == '') {
+            if (copyBoard[i][j] == '') {
                 for (var num = 1; num <= 9; num++) {
                     if (possible(i, j, num)) {
-                        copyBoard[i][j].value = num;
+                        copyBoard[i][j] = num;
                         if (solvable(copyBoard)) {
                             return true;
                         }
-                        copyBoard[i][j].value = '';
+                        copyBoard[i][j] = '';
                     }
                 }
                 return false; // return false when no number can be placed in the current cell
@@ -61,7 +68,6 @@ function solvable(board) {
     }
     return true; // return true when all cells are filled
 }
-
 function generateSolvedBoard() {
     for (var i = 0; i < 9; i++) {
         for (var j = 0; j < 9; j++) {
@@ -110,28 +116,16 @@ function generateBoard() {
     removeValues(getFilledCells());
 }
 
-async function removeValues(filledCells) {
-    if (filledCells.length == 0 || !solvable(board)) {
+async function removeValues() {
+    await new Promise(r => setTimeout(r, 100));
+    currentCell = getRandomFilledCell(getFilledCells());
+    oldVal = currentCell.value;
+    currentCell.value = '';
+    if (!solvable(board)) {
+        currentCell.value = oldVal;
         return;
     }
-    currentCell = getRandomFilledCell(getFilledCells());
-    console.log(currentCell);
-    if (solvable(getFilledCells)) {
-        console.log('solvable');
-        let oldVal = currentCell.value;
-        currentCell.value = '';
-        console.log(currentCell.value == '');
-        //sleep to see the board
-        await new Promise(r => setTimeout(r, 500));
-        if (!solvable(getFilledCells)) {
-            console.log('not solvable');
-            currentCell.value = oldVal;
-            return;
-        }else {
-            removeValues(getFilledCells());
-    }
-}
-    
+    removeValues();
 }
 
 
