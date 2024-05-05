@@ -5,13 +5,14 @@ var board = [
 ];
 
 var counter = 1;
-var coloredTiles = [];
+var redTiles = [];
+var greenTiles = [];
 var outputy = document.getElementById('outputy');
 var outputx = document.getElementById('outputx');
 var output = document.getElementById('output');
 var slider = document.getElementById("myRange");
 slider.oninput = function() {
-    minRemoved = 81 - this.value;
+    minRemoved = 81 + parseInt(this.value);
   }
 var allowedInputs = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 var x;
@@ -20,8 +21,10 @@ var grid;
 var row;
 var col;
 var solvedBoard;
-var minRemoved = 40;
+var minRemoved = 43;
 var removed;
+var savedBoardValues = [];
+var savedBoarditems = [];
 
 for (var i = 0; i < 9; i++) {
     //get current inner div
@@ -35,6 +38,7 @@ for (var i = 0; i < 9; i++) {
     //add event listener to each input
     for (var j = 0; j < 9; j++) {
         board[i][j].addEventListener('input', function(event) {
+            
             
             setValues(event);
             checkInput(event, row, col, grid);
@@ -51,26 +55,34 @@ for (var i = 0; i < 9; i++) {
     }
 }
 
+//dummy solveBoard that calls generateSolvedBoard
 function solveBoard() {
     generateSolvedBoard();
 }
 
+//colors all tiles green 
 function colorTiles() {
     for (var i = 0; i < 9; i++) {
         for (var j = 0; j < 9; j++) {
-            board[i][j].style.backgroundColor = 'rgb(103, 249, 105)';
+            board[i][j].style.backgroundColor = 'green';
+            //add to greenTiles array
+            greenTiles.push(board[i][j]);
         }
     }
 }
 
+//resets tiles to gray if not red
 function resetTiles() {
     for (var i = 0; i < 9; i++) {
         for (var j = 0; j < 9; j++) {
-            board[i][j].style.backgroundColor = 'rgb(152, 152, 152)';
+            if (greenTiles.includes(board[i][j]) && !redTiles.includes(board[i][j])) {
+                board[i][j].style.backgroundColor = 'rgb(152, 152, 152)';
+            }
         }
     }
 }
 
+//checks if board is solved
 function isSolved() {
     if (getEmptyCells().length > 0) {
         return false;
@@ -78,6 +90,7 @@ function isSolved() {
     return true;
 }
 
+// Function to generate a solved board
 function generateSolvedBoard() {
     for (var i = 0; i < 9; i++) {
         for (var j = 0; j < 9; j++) {
@@ -101,18 +114,18 @@ function generateSolvedBoard() {
     return true; // return true when all cells are filled
 }
 
-// Function to shuffle an array
+//shuffles an array
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
 
-    // While there remain elements to shuffle...
+    // while there remain elements to shuffle
     while (0 !== currentIndex) {
 
-        // Pick a remaining element...
+        // pick a remaining element
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex -= 1;
 
-        // And swap it with the current element.
+        // swap it with the current element
         temporaryValue = array[currentIndex];
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
@@ -121,13 +134,18 @@ function shuffle(array) {
     return array;
 }
 
+// generate a board then removes values depending on set difficulty
 function generateBoard() {
+    resetTiles();
     generateSolvedBoard();
     removed = 0;
     removeValues(getFilledCells());
+    savedBoardValues = elementsToValueArr(board);
+    console.log(savedBoardValues);
 }
 
-function removeValues() {
+// recursive call to remove values from the board until minRemoved is reached
+ function removeValues() {
     if (removed >= minRemoved) {
         return;
     }
@@ -138,8 +156,21 @@ function removeValues() {
     removeValues();
 }
 
+// convert array of html elements to array of values within the elements
+function elementsToValueArr(arr) {
+    // Your code here
+    let newArr = [];
+    for (var i = 0; i < arr.length; i++) {
+        newArr.push([]);
+        for (var j = 0; j < arr[i].length; j++) {
+            newArr[i].push(arr[i][j].value);
+        }
+       
+    }
+    return newArr;
+}
 
-
+// returns array of all filled cells
 function getFilledCells() {
     let filledCells = [];
     for (var i = 0; i < 9; i++) {
@@ -152,12 +183,13 @@ function getFilledCells() {
     return filledCells;
 }
 
+// returns random filled cell
 function getRandomFilledCell(filledCells) {
     let randomIndex = Math.floor(Math.random() * filledCells.length);
     return filledCells[randomIndex];
 }
 
-
+// returns array of all empty cells
 function getEmptyCells() {
     let emptyCells = [];
     for (var i = 0; i < 9; i++) {
@@ -171,19 +203,23 @@ function getEmptyCells() {
     return emptyCells;
 }
 
+// returns random empty cell
 function getRamdomEmptyCell(emptyCells) {
     let randomIndex = Math.floor(Math.random() * emptyCells.length);
     return emptyCells[randomIndex];
 }
 
+// checks if a number can be placed in a cell
 function possible(x, y, n) {
     setValues({target: board[x][y]});
     return getPossibleValues(row, col, grid).includes(n);
 }
 
+// returns array of possible values for a cell
 function getPossibleValues(row, col, grid) {
     let allValues = [];
 
+    // add existing values to allValues array
     for (var i = 0; i < 9; i++) {
         if (row[i].value != '') {
             allValues.push(parseInt(row[i].value));
@@ -196,8 +232,10 @@ function getPossibleValues(row, col, grid) {
         }
     }
 
+    // remove duplicates
     let usedValues = new Set(allValues);
     
+    // get possible values if value is not in usedValues
     let possibleValues = [];
     for (let i = 1; i <= 9; i++) {
         if (!usedValues.has(i)) {
@@ -209,12 +247,16 @@ function getPossibleValues(row, col, grid) {
 
 }
 
+// resets board to saved values
 function resetBoard() {
+    resetTiles();
+    console.log(savedBoardValues);
     for (var i = 0; i < 9; i++) {
         for (var j = 0; j < 9; j++) {
-            board[i][j].value = '';
+            board[i][j].value = savedBoardValues[i][j];
         }
     }
+
 }
 
 function setValues(event) {
@@ -282,11 +324,11 @@ function checkValidMove(target, row, col, grid) {
     }
 
     //reset colored tiles
-    if (coloredTiles.length > 0) {
-        for (var i = 0; i < coloredTiles.length; i++) {
-            coloredTiles[i].style.backgroundColor = 'rgb(152, 152, 152)';
+    if (redTiles.length > 0) {
+        for (var i = 0; i < redTiles.length; i++) {
+            redTiles[i].style.backgroundColor = 'rgb(152, 152, 152)';
         }
-        coloredTiles = [];
+        redTiles = [];
     }
 
     let value = target.value;
@@ -294,19 +336,19 @@ function checkValidMove(target, row, col, grid) {
     //check if value if valid move
     for (var i = 0; i < 9; i++) {
         if (row[i].value == value && row[i] != target) {
-            coloredTiles.push(row[i]);
-            row[i].style.backgroundColor = 'red';
+            redTiles.push(row[i]);
+            row[i].style.backgroundColor = '#FF0000';
             return false;        
         }
 
         if (col[i].value == value && col[i] != target) {
-            coloredTiles.push(col[i]);
-            col[i].style.backgroundColor = 'red';
+            redTiles.push(col[i]);
+            col[i].style.backgroundColor = '#FF0000';
             return false; 
         }
 
         if (grid[i].value == value && grid[i] != target) {
-            coloredTiles.push(grid[i]);
+            redTiles.push(grid[i]);
             grid[i].style.backgroundColor = 'red';
             return false; 
         }
